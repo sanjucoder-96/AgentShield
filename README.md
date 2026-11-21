@@ -74,6 +74,13 @@ Mint an agent token to drive the gateway yourself:
 
 ---
 
+## Windows note
+
+On Windows use **WSL** or **Git Bash** for the shell scripts, or run the pieces directly:
+`go build -o bin/gateway.exe ./cmd/gateway`, start the three tool servers in
+`tools/` with `python`, then run `bin/gateway.exe`. If you ever rebuild, delete the
+`state` folder and the old binary first so nothing stale is left behind.
+
 ## The five-minute demo
 
 `make demo` (or `python3 demo/run_demo.py`) runs a normal MCP agent through the
