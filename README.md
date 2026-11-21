@@ -1,8 +1,21 @@
-# Secure Agent Tool Gateway (PNC3)
+<div align="center">
 
-A zero-trust proxy that sits between an AI agent and its tools and decides
-**allow, deny or require-approval** for every tool call — checking who asked,
-what the call carries, where its arguments came from, and where data is going.
+# 🛡️ AgentShield
+
+**A zero-trust gateway that decides allow / deny / require-approval for every AI-agent tool call.**
+
+[![Go](https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white)](https://go.dev/)
+[![MCP](https://img.shields.io/badge/MCP-Go_SDK-000000)](https://modelcontextprotocol.io/)
+[![Cedar](https://img.shields.io/badge/Cedar-policy_engine-6B4FBB)](https://www.cedarpolicy.com/)
+[![JSON Schema](https://img.shields.io/badge/JSON_Schema-2020--12-blue)](https://json-schema.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-audit_chain-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-sessions-DC382D?logo=redis&logoColor=white)](https://redis.io/)
+[![React](https://img.shields.io/badge/React-Vite-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Docker](https://img.shields.io/badge/Docker-sandbox-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+
+A zero-trust proxy that sits between an AI agent and its tools — checking who asked, what the call carries, where its arguments came from, and where data is going.
+
+</div>
 
 > The model can be persuaded. The gateway decides what a persuaded agent is
 > allowed to do. Every decision is deterministic, explainable, and measured on
@@ -130,19 +143,21 @@ live malware.
 
 ## How a call flows through the gateway
 
-```
-agent ──MCP──> gateway
-                 1  authenticate            (JWT / OIDC; kill-switch + rate check)
-                 2  strict parse            (reject duplicate keys, batches, junk)
-                 3  manifest check          (hash pinned? else quarantine)
-                 4  canonicalize + decode   (NFKC, strip invisibles, un-encode)
-                 5  schema validate         (pinned JSON Schema; no smuggled args)
-                 6  inspect -> facts        (destinations, IPs, paths, cmds, secrets, taint)
-                 7  Cedar policy decision    ─┬─> ALLOW ── inject creds, run in harness
-                                              ├─> APPROVE? ─ hold for a human (timeout = deny)
-                                              └─> DENY ──── reason code, no internals
-                 8  inspect response        (redact secrets, flag injection, update taint)
-                 9  sign + append audit     (Ed25519 hash chain) + live dashboard
+```mermaid
+flowchart TD
+    Agent["AI agent"] -->|MCP| GW["Gateway"]
+    GW --> S1["1 · Authenticate<br/>JWT / OIDC · kill-switch · rate check"]
+    S1 --> S2["2 · Strict parse<br/>reject duplicate keys, batches, junk"]
+    S2 --> S3["3 · Manifest check<br/>hash pinned? else quarantine"]
+    S3 --> S4["4 · Canonicalize + decode<br/>NFKC, strip invisibles, un-encode"]
+    S4 --> S5["5 · Schema validate<br/>pinned JSON Schema, no smuggled args"]
+    S5 --> S6["6 · Inspect → facts<br/>destinations, IPs, paths, cmds, secrets, taint"]
+    S6 --> S7{"7 · Cedar policy decision"}
+    S7 -->|ALLOW| Allow["Inject creds, run in harness"]
+    S7 -->|"APPROVE?"| Approve["Hold for a human<br/>timeout = deny"]
+    S7 -->|DENY| Deny["Reason code, no internals"]
+    Allow --> S8["8 · Inspect response<br/>redact secrets, flag injection, update taint"]
+    S8 --> S9["9 · Sign + append audit<br/>Ed25519 hash chain + live dashboard"]
 ```
 
 Steps 1–7 are deterministic, so every verdict is explainable. The gateway
