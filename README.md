@@ -21,7 +21,7 @@ A zero-trust proxy that sits between an AI agent and its tools — checking who 
 > allowed to do. Every decision is deterministic, explainable, and measured on
 > a corpus anyone can rerun.
 
-Built for the NRCM hackathon problem statement **PNC3 — Secure Agent Tool
+Built for the Secure Agent Tool
 Gateway** (Cybersecurity and Threat Intelligence). This repository is the
 Level 1–2 deliverable: a working MVP plus the architecture, stack and
 evaluation behind it.
